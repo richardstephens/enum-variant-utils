@@ -1,0 +1,7 @@
+[workspace]
+members = [
+	"enum-variant-utils",
+	"enum-variant-utils-macros",
+]
+resolver = "2"
+
