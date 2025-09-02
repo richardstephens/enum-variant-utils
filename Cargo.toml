@@ -2,6 +2,7 @@
 members = [
 	"enum-variant-utils",
 	"enum-variant-utils-macros",
+	"enum-variant-utils-tests",
 ]
 resolver = "2"
 

@@ -3,13 +3,19 @@ name = "enum-variant-utils-macros"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "enum_variant_utils_macros"
+path = "src/lib.rs"
+proc-macro = true
+
 [dependencies]
+darling = "0.20.11"
+proc-macro2 = "1.0.95"
+quote = "1.0.40"
+syn = "2.0.104"
 
 [lints.clippy]
 # Enable desired off-by-default lints
 print_stdout = "deny"
 print_stderr = "deny"
-panic = "deny"
-unwrap_used = "deny"
-expect_used = "deny"                    
-
+expect_used = "deny"

@@ -1,0 +1,7 @@
+[package]
+name = "enum-variant-utils-tests"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+enum-variant-utils-macros = { path = "../enum-variant-utils-macros" }
