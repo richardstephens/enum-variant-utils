@@ -7,7 +7,6 @@ enum MyEnum {
     VariantThree,
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::variant_name_tests::MyEnum;

@@ -9,6 +9,7 @@ path = "src/lib.rs"
 proc-macro = true
 
 [dependencies]
+convert_case = "0.8.0"
 darling = "0.20.11"
 proc-macro2 = "1.0.95"
 quote = "1.0.40"

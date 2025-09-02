@@ -2,26 +2,29 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{Data, DataEnum};
 
-pub(crate) fn derive_variant_name_impl(item: TokenStream) -> TokenStream {
+pub(crate) fn derive_is_variant_impl(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
     let ident = &input.ident;
 
     match &input.data {
         Data::Enum(DataEnum { variants, .. }) => {
-            let match_arms = variants.iter().map(|v| {
+            let is_variant_fns = variants.iter().map(|v| {
                 let v_ident = &v.ident;
+                let fn_name = syn::Ident::new(
+                    &format!("is_{}", v_ident.to_string().to_lowercase()),
+                    v_ident.span(),
+                );
+
                 quote! {
-                    Self::#v_ident { .. } => stringify!(#v_ident),
+                    pub fn #fn_name(&self) -> bool {
+                        matches!(self, Self::#v_ident { .. })
+                    }
                 }
             });
             quote! {
                 #[automatically_derived]
                 impl #ident {
-                    pub fn varient_name(&self) -> &'static str {
-                        match self {
-                            #(#match_arms)*
-                        }
-                    }
+                    #(#is_variant_fns)*
                 }
             }
             .into()
