@@ -46,6 +46,10 @@ mod tests {
     }
 
     #[test]
+    fn second_kind() {
+        assert_eq!(VariantKind::SecondKind, TestEnum::VariantTwo.get_def().kind);
+    }
+    #[test]
     fn default_kind() {
         assert_eq!(
             VariantKind::UnknownKind,
