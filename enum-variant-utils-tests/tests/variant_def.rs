@@ -23,14 +23,10 @@ enum TestEnum {
     VariantOne,
     #[def(message = "Variant two details", kind = VariantKind::SecondKind)]
     VariantTwo,
-    #[def(message = "Variant three")]
+    #[def(message = "Variant 3", added_by = Some("steve"))]
     VariantThree,
-    #[def(message = "Variant four", added_by = Some("steve"))]
+    #[def(message = "Variant four")]
     VariantFour,
-    #[def(message = "Variant five")]
-    VariantFive,
-    #[def(message = "Variant six")]
-    VariantSix,
 }
 
 #[cfg(test)]
@@ -53,12 +49,13 @@ mod tests {
     fn default_kind() {
         assert_eq!(
             VariantKind::UnknownKind,
-            TestEnum::VariantSix.get_def().kind
+            TestEnum::VariantFour.get_def().kind
         );
     }
 
     #[test]
     fn optional_field() {
-        assert_eq!("steve", TestEnum::VariantFour.get_def().added_by.unwrap());
+        assert_eq!("steve", TestEnum::VariantThree.get_def().added_by.unwrap());
+        assert_eq!(None, TestEnum::VariantFour.get_def().added_by);
     }
 }
