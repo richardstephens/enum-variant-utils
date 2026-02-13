@@ -15,7 +15,7 @@ pub enum MyEnumDisplayTest {
 }
 #[cfg(test)]
 mod tests {
-    use crate::variant_name_tests::{MyEnum, MyEnumDisplayTest};
+    use crate::{MyEnum, MyEnumDisplayTest};
 
     #[test]
     fn get_variant_name() {

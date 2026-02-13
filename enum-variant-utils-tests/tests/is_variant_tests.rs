@@ -16,7 +16,7 @@ pub enum MyEnum {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_variant_tests::MyEnum;
+    use crate::MyEnum;
 
     #[test]
     fn simple_case() {

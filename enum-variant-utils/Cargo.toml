@@ -11,5 +11,5 @@ print_stdout = "deny"
 print_stderr = "deny"
 panic = "deny"
 unwrap_used = "deny"
-expect_used = "deny"                    
+expect_used = "deny"
 

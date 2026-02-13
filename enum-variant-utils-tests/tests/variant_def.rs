@@ -35,7 +35,7 @@ enum TestEnum {
 
 #[cfg(test)]
 mod tests {
-    use crate::variant_def::{TestEnum, TestEnumVariantDef, VariantKind};
+    use crate::{TestEnum, TestEnumVariantDef, VariantKind};
 
     #[test]
     fn get_def() {
