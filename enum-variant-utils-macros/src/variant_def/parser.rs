@@ -6,6 +6,7 @@ pub(crate) struct VariantDefInput {
     pub enum_ident: syn::Ident,
     pub def_struct: proc_macro2::TokenStream,
     pub getter: syn::Ident,
+    pub all_getter: Option<syn::Ident>,
     pub defaults: Vec<(syn::Ident, proc_macro2::TokenStream)>,
     pub variants: Vec<VariantDef>,
 }
@@ -26,6 +27,7 @@ impl VariantDefInput {
 
         let mut def_struct: Option<proc_macro2::TokenStream> = None;
         let mut getter: Option<syn::Ident> = None;
+        let mut all_getter: Option<syn::Ident> = None;
         let mut defaults: Vec<(syn::Ident, proc_macro2::TokenStream)> = Vec::new();
 
         for (key, value) in enum_def.pairs {
@@ -34,6 +36,8 @@ impl VariantDefInput {
                 def_struct = Some(value);
             } else if key_str == "getter" {
                 getter = Some(syn::parse2(value).expect("getter must be an identifier"));
+            } else if key_str == "all_getter" {
+                all_getter = Some(syn::parse2(value).expect("all_getter must be an identifier"));
             } else if let Some(field_name) = key_str.strip_prefix("default_") {
                 defaults.push((syn::Ident::new(field_name, key.span()), value));
             } else {
@@ -73,6 +77,7 @@ impl VariantDefInput {
             enum_ident,
             def_struct,
             getter,
+            all_getter,
             defaults,
             variants,
         }
