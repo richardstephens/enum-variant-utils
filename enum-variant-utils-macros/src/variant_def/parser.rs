@@ -5,7 +5,7 @@ use syn::{Data, DataEnum, Token};
 pub(crate) struct VariantDefInput {
     pub enum_ident: syn::Ident,
     pub def_struct: proc_macro2::TokenStream,
-    pub getter: syn::Ident,
+    pub getter: Option<syn::Ident>,
     pub all_getter: Option<syn::Ident>,
     pub defaults: Vec<(syn::Ident, proc_macro2::TokenStream)>,
     pub variants: Vec<VariantDef>,
@@ -46,7 +46,6 @@ impl VariantDefInput {
         }
 
         let def_struct = def_struct.expect("VariantDef requires struct=<Type> in #[def(...)]");
-        let getter = getter.expect("VariantDef requires getter=<name> in #[def(...)]");
 
         let variants = match &input.data {
             Data::Enum(DataEnum { variants, .. }) => variants

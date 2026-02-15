@@ -1,9 +1,10 @@
 [package]
 name = "enum-variant-utils"
-version = "0.1.0"
+version.workspace = true
 edition = "2024"
 
 [dependencies]
+enum-variant-utils-macros.workspace = true
 
 [lints.clippy]
 # Enable desired off-by-default lints

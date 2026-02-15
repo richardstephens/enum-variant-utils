@@ -5,7 +5,6 @@ use quote::{format_ident, quote};
 pub fn generate(input: &VariantDefInput) -> proc_macro2::TokenStream {
     let enum_ident = &input.enum_ident;
     let def_struct = &input.def_struct;
-    let getter = &input.getter;
 
     let conv = Converter::new()
         .from_case(Case::Pascal)
@@ -74,12 +73,18 @@ pub fn generate(input: &VariantDefInput) -> proc_macro2::TokenStream {
         })
         .collect();
 
+    let getter_fn = input.getter.as_ref().map(|getter| {
+        quote! {
+            pub const fn #getter(&self) -> &'static #def_struct {
+                match self {
+                    #(#match_arms)*
+                }
+            }
+        }
+    });
+
     let all_getter_fn = input.all_getter.as_ref().map(|all_getter| {
         quote! {
-            const ALL_DEFS: &'static [#def_struct] = &[
-                #(Self::#const_names,)*
-            ];
-
             pub const fn #all_getter() -> &'static [#def_struct] {
                 Self::ALL_DEFS
             }
@@ -91,13 +96,27 @@ pub fn generate(input: &VariantDefInput) -> proc_macro2::TokenStream {
         impl #enum_ident {
             #(#const_defs)*
 
-            pub const fn #getter(&self) -> &'static #def_struct {
+            const ALL_DEFS: &'static [#def_struct] = &[
+                #(Self::#const_names,)*
+            ];
+
+            #getter_fn
+            #all_getter_fn
+        }
+
+        #[automatically_derived]
+        impl enum_variant_utils::variant_def::VariantDef for #enum_ident {
+            type Def = #def_struct;
+
+            fn variant_def(&self) -> &'static Self::Def {
                 match self {
                     #(#match_arms)*
                 }
             }
 
-            #all_getter_fn
+            fn all_variant_defs() -> &'static [Self::Def] {
+                Self::ALL_DEFS
+            }
         }
     }
 }

@@ -33,6 +33,26 @@ enum TestEnum {
 #[cfg(test)]
 mod tests {
     use crate::{TestEnum, TestEnumVariantDef, VariantKind};
+    use enum_variant_utils::variant_def::VariantDef;
+
+    #[test]
+    fn trait_variant_def() {
+        assert_eq!(
+            &TestEnumVariantDef {
+                message: "Variant one details",
+                kind: VariantKind::FirstKind,
+                added_by: None,
+            },
+            TestEnum::VariantOne.variant_def()
+        );
+    }
+
+    #[test]
+    fn trait_all_variant_defs() {
+        let all = TestEnum::all_variant_defs();
+        assert_eq!(4, all.len());
+        assert_eq!("Variant one details", all[0].message);
+    }
 
     #[test]
     fn get_def() {
