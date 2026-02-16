@@ -19,4 +19,3 @@ syn = "2.0.104"
 # Enable desired off-by-default lints
 print_stdout = "deny"
 print_stderr = "deny"
-expect_used = "deny"
