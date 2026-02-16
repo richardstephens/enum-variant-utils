@@ -2,14 +2,18 @@ use crate::variant_def::parser::{VariantDef, VariantDefInput};
 use convert_case::{Case, Converter};
 use quote::{format_ident, quote};
 
-fn resolve_case(name: &str) -> Case<'_> {
+fn variant_name_converter(name: &str) -> Converter {
+    let base = Converter::new().from_case(Case::Pascal);
     match name {
-        "snake_case" => Case::Snake,
-        "SCREAMING_SNAKE_CASE" => Case::UpperSnake,
-        "camelCase" => Case::Camel,
-        "PascalCase" => Case::Pascal,
-        "kebab-case" => Case::Kebab,
-        "SCREAMING-KEBAB-CASE" => Case::UpperKebab,
+        "snake_case" => base.to_case(Case::Snake),
+        "SCREAMING_SNAKE_CASE" => base.to_case(Case::UpperSnake),
+        "camelCase" => base.to_case(Case::Camel),
+        "PascalCase" => base.to_case(Case::Pascal),
+        "kebab-case" => base.to_case(Case::Kebab),
+        "SCREAMING-KEBAB-CASE" => base.to_case(Case::UpperKebab),
+        "dotted.lower.case" => base
+            .set_pattern(convert_case::pattern::lowercase)
+            .set_delim("."),
         other => panic!("Unsupported variant_name_case: {}", other),
     }
 }
@@ -81,23 +85,20 @@ pub fn generate(input: &VariantDefInput) -> proc_macro2::TokenStream {
         all_field_names.insert(0, name_field.clone());
     }
 
-    let variant_name_conv_fn = input.variant_name_case.as_ref().map(|c| {
-        |s: &str| {
-            Converter::new()
-                .from_case(Case::Pascal)
-                .to_case(resolve_case(c))
-                .convert(s)
-        }
-    });
+    let variant_name_conv = input
+        .variant_name_case
+        .as_ref()
+        .map(|c| variant_name_converter(c));
 
     let variant_names: Vec<String> = input
         .variants
         .iter()
         .map(|v| {
             let name = v.ident.to_string();
-            variant_name_conv_fn
-                .map(|conv_fn| (conv_fn)(&name))
-                .unwrap_or_else(|| name)
+            match &variant_name_conv {
+                Some(conv) => conv.convert(&name),
+                None => name,
+            }
         })
         .collect();
 
