@@ -1,7 +1,12 @@
 [package]
 name = "evutils"
+
 version.workspace = true
-edition = "2024"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+
 
 [dependencies]
 evutils-macros.workspace = true
