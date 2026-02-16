@@ -8,6 +8,8 @@ pub(crate) struct VariantDefInput {
     pub getter: Option<syn::Ident>,
     pub all_getter: Option<syn::Ident>,
     pub builder: Option<proc_macro2::TokenStream>,
+    pub variant_name_field: Option<syn::Ident>,
+    pub variant_name_case: Option<String>,
     pub defaults: Vec<(syn::Ident, proc_macro2::TokenStream)>,
     pub variants: Vec<VariantDef>,
 }
@@ -30,6 +32,8 @@ impl VariantDefInput {
         let mut getter: Option<syn::Ident> = None;
         let mut all_getter: Option<syn::Ident> = None;
         let mut builder: Option<proc_macro2::TokenStream> = None;
+        let mut variant_name_field: Option<syn::Ident> = None;
+        let mut variant_name_case: Option<String> = None;
         let mut defaults: Vec<(syn::Ident, proc_macro2::TokenStream)> = Vec::new();
 
         for (key, value) in enum_def.pairs {
@@ -42,6 +46,13 @@ impl VariantDefInput {
                 all_getter = Some(syn::parse2(value).expect("all_getter must be an identifier"));
             } else if key_str == "builder_fn" {
                 builder = Some(value);
+            } else if key_str == "variant_name_field" {
+                variant_name_field =
+                    Some(syn::parse2(value).expect("variant_name_field must be an identifier"));
+            } else if key_str == "variant_name_case" {
+                let ident: syn::Ident =
+                    syn::parse2(value).expect("variant_name_case must be an identifier");
+                variant_name_case = Some(ident.to_string());
             } else if let Some(field_name) = key_str.strip_prefix("default_") {
                 defaults.push((syn::Ident::new(field_name, key.span()), value));
             } else {
@@ -82,6 +93,8 @@ impl VariantDefInput {
             getter,
             all_getter,
             builder,
+            variant_name_field,
+            variant_name_case,
             defaults,
             variants,
         }

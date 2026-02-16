@@ -1,6 +1,50 @@
-use crate::variant_def::parser::VariantDefInput;
+use crate::variant_def::parser::{VariantDef, VariantDefInput};
 use convert_case::{Case, Converter};
 use quote::{format_ident, quote};
+
+fn resolve_case(name: &str) -> Case<'_> {
+    match name {
+        "snake_case" => Case::Snake,
+        "SCREAMING_SNAKE_CASE" => Case::UpperSnake,
+        "camelCase" => Case::Camel,
+        "PascalCase" => Case::Pascal,
+        "kebab-case" => Case::Kebab,
+        "SCREAMING-KEBAB-CASE" => Case::UpperKebab,
+        other => panic!("Unsupported variant_name_case: {}", other),
+    }
+}
+
+/// Resolve field values for a variant: variant-level attrs, then enum-level
+/// defaults, then variant_name_field injection. Returns (field_name, tokens)
+/// pairs for all fields that have a value.
+fn resolve_fields<'a>(
+    variant: &'a VariantDef,
+    input: &'a VariantDefInput,
+    all_field_names: &'a [syn::Ident],
+    variant_name: &'a str,
+) -> Vec<(&'a syn::Ident, proc_macro2::TokenStream)> {
+    all_field_names
+        .iter()
+        .filter_map(|field_name| {
+            if let Some(name_field) = &input.variant_name_field
+                && field_name == name_field
+            {
+                Some((field_name, quote! { #variant_name }))
+            } else if let Some((_, val)) = variant.fields.iter().find(|(k, _)| k == field_name) {
+                Some((field_name, val.clone()))
+            } else if let Some((_, val)) = input.defaults.iter().find(|(k, _)| k == field_name) {
+                Some((field_name, val.clone()))
+            } else if input.builder.is_none() {
+                panic!(
+                    "Field `{}` used by variant `{}` has no default value",
+                    field_name, variant.ident
+                );
+            } else {
+                None
+            }
+        })
+        .collect()
+}
 
 pub fn generate(input: &VariantDefInput) -> proc_macro2::TokenStream {
     let enum_ident = &input.enum_ident;
@@ -30,49 +74,55 @@ pub fn generate(input: &VariantDefInput) -> proc_macro2::TokenStream {
         }
     }
 
-    let const_defs: Vec<_> = input
+    // If injecting the variant name into the def, it needs to be added to the list of field names
+    if let Some(name_field) = &input.variant_name_field
+        && !all_field_names.iter().any(|k| k == name_field)
+    {
+        all_field_names.insert(0, name_field.clone());
+    }
+
+    let variant_name_conv_fn = input.variant_name_case.as_ref().map(|c| {
+        |s: &str| {
+            Converter::new()
+                .from_case(Case::Pascal)
+                .to_case(resolve_case(c))
+                .convert(s)
+        }
+    });
+
+    let variant_names: Vec<String> = input
         .variants
         .iter()
-        .zip(const_names.iter())
-        .map(|(v, const_name)| {
-            let fields: Vec<_> = all_field_names
-                .iter()
-                .filter_map(|field_name| {
-                    let val = if let Some((_, val)) = v.fields.iter().find(|(k, _)| k == field_name)
-                    {
-                        val
-                    } else if let Some((_, val)) =
-                        input.defaults.iter().find(|(k, _)| k == field_name)
-                    {
-                        val
-                    } else {
-                        if input.builder.is_none() {
-                            panic!(
-                                "Field `{}` used by variant `{}` has no default value",
-                                field_name, v.ident
-                            );
-                        } else {
-                            return None;
-                        }
-                    };
-                    if input.builder.is_some() {
-                        Some(quote! { .#field_name(#val) })
-                    } else {
-                        Some(quote! { #field_name: #val })
-                    }
-                })
-                .collect();
+        .map(|v| {
+            let name = v.ident.to_string();
+            variant_name_conv_fn
+                .map(|conv_fn| (conv_fn)(&name))
+                .unwrap_or_else(|| name)
+        })
+        .collect();
+
+    let const_defs: Vec<_> = itertools::izip!(&input.variants, &const_names, &variant_names)
+        .map(|(v, const_name, vname)| {
+            let fields = resolve_fields(v, input, &all_field_names, vname);
 
             if let Some(builder_fn) = &input.builder {
+                let calls: Vec<_> = fields
+                    .iter()
+                    .map(|(name, val)| quote! { .#name(#val) })
+                    .collect();
                 quote! {
                     const #const_name: #def_struct = #builder_fn
-                        #(#fields)*
+                        #(#calls)*
                         .build();
                 }
             } else {
+                let assignments: Vec<_> = fields
+                    .iter()
+                    .map(|(name, val)| quote! { #name: #val })
+                    .collect();
                 quote! {
                     const #const_name: #def_struct = #def_struct {
-                        #(#fields,)*
+                        #(#assignments,)*
                     };
                 }
             }
