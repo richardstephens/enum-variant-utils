@@ -59,9 +59,7 @@ impl VariantDefInput {
                 variant_name_field =
                     Some(syn::parse2(value).expect("variant_name_field must be an identifier"));
             } else if key_str == "variant_name_case" {
-                let ident: syn::Ident =
-                    syn::parse2(value).expect("variant_name_case must be an identifier");
-                variant_name_case = Some(ident.to_string());
+                variant_name_case = Some(value.to_string());
             } else if let Some(field_name) = key_str.strip_prefix("default_") {
                 defaults.push((syn::Ident::new(field_name, key.span()), value));
             } else {
