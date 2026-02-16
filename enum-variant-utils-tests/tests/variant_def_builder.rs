@@ -11,7 +11,7 @@ struct FruitProps {
 }
 
 #[derive(VariantDef)]
-#[def(struct = FruitProps, builder_fn = FruitProps::builder())]
+#[def(struct = FruitProps, builder)]
 enum Fruit {
     #[def(colour = "red")]
     Tomato,

@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use syn::ext::IdentExt;
 use syn::parse::{Parse, ParseStream};
 use syn::{Data, DataEnum, Token};
@@ -28,6 +29,8 @@ impl VariantDefInput {
             .parse_args()
             .expect("Failed to parse enum-level #[def(...)] attribute");
 
+        let mut flags: HashSet<String> = enum_def.flags.iter().map(|f| f.to_string()).collect();
+
         let mut def_struct: Option<proc_macro2::TokenStream> = None;
         let mut getter: Option<syn::Ident> = None;
         let mut all_getter: Option<syn::Ident> = None;
@@ -35,6 +38,12 @@ impl VariantDefInput {
         let mut variant_name_field: Option<syn::Ident> = None;
         let mut variant_name_case: Option<String> = None;
         let mut defaults: Vec<(syn::Ident, proc_macro2::TokenStream)> = Vec::new();
+
+        let use_default_builder = flags.remove("builder");
+
+        if !flags.is_empty() {
+            panic!("Unknown enum-level flags: {:?}", flags);
+        }
 
         for (key, value) in enum_def.pairs {
             let key_str = key.to_string();
@@ -61,6 +70,10 @@ impl VariantDefInput {
         }
 
         let def_struct = def_struct.expect("VariantDef requires struct=<Type> in #[def(...)]");
+
+        if use_default_builder && builder.is_none() {
+            builder = Some(quote::quote! { #def_struct::builder() });
+        }
 
         let variants = match &input.data {
             Data::Enum(DataEnum { variants, .. }) => variants
@@ -103,27 +116,33 @@ impl VariantDefInput {
 
 pub(crate) struct DefAttr {
     pairs: Vec<(syn::Ident, proc_macro2::TokenStream)>,
+    flags: Vec<syn::Ident>,
 }
 
 impl Parse for DefAttr {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let mut pairs = Vec::new();
+        let mut pairs = vec![];
+        let mut flags = vec![];
         while !input.is_empty() {
             let key = syn::Ident::parse_any(input)?;
-            input.parse::<Token![=]>()?;
 
-            let mut tokens = proc_macro2::TokenStream::new();
-            while !input.is_empty() && !input.peek(Token![,]) {
-                let tt: proc_macro2::TokenTree = input.parse()?;
-                tokens.extend(std::iter::once(tt));
-            }
-            pairs.push((key, tokens));
+            if input.peek(Token![=]) {
+                input.parse::<Token![=]>()?;
+                let mut tokens = proc_macro2::TokenStream::new();
+                while !input.is_empty() && !input.peek(Token![,]) {
+                    let tt: proc_macro2::TokenTree = input.parse()?;
+                    tokens.extend(std::iter::once(tt));
+                }
+                pairs.push((key, tokens));
+            } else {
+                flags.push(key);
+            };
 
             if input.peek(Token![,]) {
                 input.parse::<Token![,]>()?;
             }
         }
-        Ok(DefAttr { pairs })
+        Ok(DefAttr { pairs, flags })
     }
 }
 
