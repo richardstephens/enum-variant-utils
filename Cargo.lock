@@ -78,14 +78,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 
 [[package]]
-name = "enum-variant-utils"
+name = "evutils"
 version = "0.1.0"
 dependencies = [
- "enum-variant-utils-macros",
+ "evutils-macros",
 ]
 
 [[package]]
-name = "enum-variant-utils-macros"
+name = "evutils-macros"
 version = "0.1.0"
 dependencies = [
  "convert_case",
@@ -97,12 +97,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "enum-variant-utils-tests"
+name = "evutils-tests"
 version = "0.1.0"
 dependencies = [
  "bon",
- "enum-variant-utils",
- "enum-variant-utils-macros",
+ "evutils",
+ "evutils-macros",
 ]
 
 [[package]]

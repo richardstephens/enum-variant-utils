@@ -1,4 +1,5 @@
-pub use enum_variant_utils_macros::VariantDef;
+pub use evutils_macros::VariantDef;
+
 pub trait VariantDef {
     type Def;
     fn variant_def(&self) -> &'static Self::Def;

@@ -174,7 +174,7 @@ pub fn generate(input: &VariantDefInput) -> proc_macro2::TokenStream {
         }
 
         #[automatically_derived]
-        impl enum_variant_utils::variant_def::VariantDef for #enum_ident {
+        impl evutils::variant_def::VariantDef for #enum_ident {
             type Def = #def_struct;
 
             fn variant_def(&self) -> &'static Self::Def {

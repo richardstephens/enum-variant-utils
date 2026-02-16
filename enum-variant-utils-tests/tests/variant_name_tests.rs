@@ -1,4 +1,4 @@
-use enum_variant_utils_macros::{DisplayVariantName, VariantName};
+use evutils_macros::{DisplayVariantName, VariantName};
 
 #[derive(VariantName)]
 pub enum MyEnum {

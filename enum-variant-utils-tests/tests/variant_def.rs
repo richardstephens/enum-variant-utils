@@ -1,4 +1,4 @@
-use enum_variant_utils_macros::VariantDef;
+use evutils::variant_def::VariantDef;
 
 #[derive(Default, Debug, PartialEq)]
 enum VariantKind {
@@ -33,7 +33,7 @@ enum TestEnum {
 #[cfg(test)]
 mod tests {
     use crate::{TestEnum, TestEnumVariantDef, VariantKind};
-    use enum_variant_utils::variant_def::VariantDef;
+    use evutils::variant_def::VariantDef;
 
     #[test]
     fn trait_variant_def() {

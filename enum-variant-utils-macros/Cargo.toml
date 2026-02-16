@@ -1,10 +1,10 @@
 [package]
-name = "enum-variant-utils-macros"
+name = "evutils-macros"
 version.workspace = true
 edition = "2024"
 
 [lib]
-name = "enum_variant_utils_macros"
+name = "evutils_macros"
 path = "src/lib.rs"
 proc-macro = true
 

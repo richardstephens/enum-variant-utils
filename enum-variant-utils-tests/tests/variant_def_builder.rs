@@ -1,5 +1,5 @@
 use bon::Builder;
-use enum_variant_utils_macros::VariantDef;
+use evutils::variant_def::VariantDef;
 
 #[derive(Builder)]
 #[builder(const)]
@@ -24,7 +24,7 @@ enum Fruit {
 #[cfg(test)]
 mod tests {
     use crate::Fruit;
-    use enum_variant_utils::variant_def::VariantDef;
+    use evutils::variant_def::VariantDef;
 
     #[test]
     fn explicit_field() {

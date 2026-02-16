@@ -1,10 +1,10 @@
 [package]
-name = "enum-variant-utils-tests"
+name = "evutils-tests"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 bon = "3.9.0"
-enum-variant-utils = { path = "../enum-variant-utils" }
-enum-variant-utils-macros = { path = "../enum-variant-utils-macros" }
+evutils = { path = "../enum-variant-utils" }
+evutils-macros = { path = "../enum-variant-utils-macros" }
 

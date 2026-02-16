@@ -10,5 +10,5 @@ resolver = "2"
 version = "0.1.0"
 
 [workspace.dependencies]
-enum-variant-utils = { path = "enum-variant-utils", version = "0.1.0"}
-enum-variant-utils-macros = { path = "enum-variant-utils-macros", version = "0.1.0"}
+evutils = { path = "enum-variant-utils", version = "0.1.0"}
+evutils-macros = { path = "enum-variant-utils-macros", version = "0.1.0"}
