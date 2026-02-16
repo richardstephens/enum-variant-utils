@@ -7,11 +7,13 @@ members = [
 resolver = "2"
 
 [workspace.package]
+description = "Handy helper utilities for working with enum variants"
 version = "0.1.0"
 license = "MIT"
 repository = "https://github.com/richardstephens/enum-variant-utils"
 readme = "README.md"
 edition = "2024"
+authors = ["Richard Stephens <richard@richst.dev>"]
 
 [workspace.dependencies]
 evutils = { path = "enum-variant-utils", version = "0.1.0"}

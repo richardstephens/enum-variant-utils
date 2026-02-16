@@ -1,12 +1,13 @@
 [package]
 name = "evutils"
 
+description.workspace = true
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 readme.workspace = true
-
+authors.workspace = true
 
 [dependencies]
 evutils-macros.workspace = true
