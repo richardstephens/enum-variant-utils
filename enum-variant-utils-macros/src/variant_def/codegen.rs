@@ -35,28 +35,46 @@ pub fn generate(input: &VariantDefInput) -> proc_macro2::TokenStream {
         .iter()
         .zip(const_names.iter())
         .map(|(v, const_name)| {
-            let field_assignments: Vec<_> = all_field_names
+            let fields: Vec<_> = all_field_names
                 .iter()
-                .map(|field_name| {
-                    if let Some((_, val)) = v.fields.iter().find(|(k, _)| k == field_name) {
-                        quote! { #field_name: #val }
+                .filter_map(|field_name| {
+                    let val = if let Some((_, val)) = v.fields.iter().find(|(k, _)| k == field_name)
+                    {
+                        val
                     } else if let Some((_, val)) =
                         input.defaults.iter().find(|(k, _)| k == field_name)
                     {
-                        quote! { #field_name: #val }
+                        val
                     } else {
-                        panic!(
-                            "Field `{}` used by variant `{}` has no default value",
-                            field_name, v.ident
-                        );
+                        if input.builder.is_none() {
+                            panic!(
+                                "Field `{}` used by variant `{}` has no default value",
+                                field_name, v.ident
+                            );
+                        } else {
+                            return None;
+                        }
+                    };
+                    if input.builder.is_some() {
+                        Some(quote! { .#field_name(#val) })
+                    } else {
+                        Some(quote! { #field_name: #val })
                     }
                 })
                 .collect();
 
-            quote! {
-                const #const_name: #def_struct = #def_struct {
-                    #(#field_assignments,)*
-                };
+            if let Some(builder_fn) = &input.builder {
+                quote! {
+                    const #const_name: #def_struct = #builder_fn
+                        #(#fields)*
+                        .build();
+                }
+            } else {
+                quote! {
+                    const #const_name: #def_struct = #def_struct {
+                        #(#fields,)*
+                    };
+                }
             }
         })
         .collect();
