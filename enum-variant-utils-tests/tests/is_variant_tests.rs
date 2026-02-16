@@ -1,4 +1,4 @@
-use evutils_macros::IsVariant;
+use evutils::is_variant::IsVariant;
 
 pub struct InnerStruct {
     pub blah: String,

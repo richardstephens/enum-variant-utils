@@ -6,5 +6,3 @@ edition = "2024"
 [dependencies]
 bon = "3.9.0"
 evutils = { path = "../enum-variant-utils" }
-evutils-macros = { path = "../enum-variant-utils-macros" }
-
