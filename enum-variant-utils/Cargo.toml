@@ -11,6 +11,7 @@ authors.workspace = true
 
 [dependencies]
 evutils-macros.workspace = true
+serde_json.workspace = true
 
 [lints.clippy]
 # Enable desired off-by-default lints

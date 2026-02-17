@@ -18,3 +18,4 @@ authors = ["Richard Stephens <richard@richst.dev>"]
 [workspace.dependencies]
 evutils = { path = "enum-variant-utils", version = "0.1.0"}
 evutils-macros = { path = "enum-variant-utils-macros", version = "0.1.0"}
+serde_json = "1"

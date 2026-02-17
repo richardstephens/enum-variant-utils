@@ -6,3 +6,5 @@ edition = "2024"
 [dependencies]
 bon = "3.9.0"
 evutils = { path = "../enum-variant-utils" }
+serde = { version = "1", features = ["derive"] }
+serde_json.workspace = true

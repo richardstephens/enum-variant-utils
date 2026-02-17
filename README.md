@@ -8,5 +8,6 @@ Handy utilities for working with Rust enums.
   make metadata about your enum variants available in a consistent way
 * IsVariant - quickly check if something is an instance of a specific variant
 * VariantName - quickly get (just) the variant name
+* VariantPropsToJsonArray - get the variants properties as a `Vec<serde_json::Value>`
 
 More tools and detailed docs to follow soon.
